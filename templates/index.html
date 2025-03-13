@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Cricket Match</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .container { max-width: 600px; margin: auto; padding: 20px; }
+        .box { border: 1px solid #ccc; padding: 20px; margin: 10px 0; border-radius: 10px; }
+        .win { font-weight: bold; color: green; }
+    </style>
+    <script>
+        // Function to update scores dynamically every 5 seconds
+        function updateScore() {
+            fetch('/live-score')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById("match-info").innerHTML = "<h2>No Live India Match</h2>";
+                        return;
+                    }
+
+                    document.getElementById("series").innerText = data.series;
+                    document.getElementById("teams").innerText = `${data.team1} vs ${data.team2}`;
+                    document.getElementById("team1_score").innerText = data.team1_score;
+                    document.getElementById("team2_score").innerText = data.team2_score;
+                    document.getElementById("status").innerText = data.status;
+                    document.getElementById("projected_score").innerText = data.projected_score;
+                    document.getElementById("win_probability").innerText = 
+                        `${data.team1}: ${data.win_probability.team1}% | ${data.team2}: ${data.win_probability.team2}%`;
+                })
+                .catch(error => console.error('Error fetching live data:', error));
+        }
+
+        // Auto-refresh scores every 5 seconds
+        setInterval(updateScore, 5000);
+    </script>
+</head>
+<body onload="updateScore()">
+    <div class="container">
+        <h1>🏏 Live Cricket Match</h1>
+        <div id="match-info">
+            <h2 id="series">Loading...</h2>
+            <div class="box">
+                <h3 id="teams">Fetching match details...</h3>
+                <p>📊 Score: <span id="team1_score"></span> vs <span id="team2_score"></span></p>
+                <p>📢 Match Status: <span id="status"></span></p>
+            </div>
+            <div class="box">
+                <h3>🔮 Predictions</h3>
+                <p>📈 Predicted Final Score: <span id="projected_score"></span></p>
+                <p class="win">Win Probability: <span id="win_probability"></span></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
